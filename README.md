@@ -59,7 +59,33 @@ In summary
 
 ## Code changes to implement softmax1
 
-TODO: Describe the code change made to do this...
+I have reviewed he following code, taken from https://github.com/softmax1/EsperBERTo/blob/7d2d5ed8695b95ade6bcbe21b7ce981b3c9394d7/src/functional.py#L7, and I will probably use this (subject to license being published).
+
+```python
+def softmax_n_shifted_zeros(input: Tensor, n: int) -> Tensor:
+    """
+    $\text(softmax)_n(x_i) = exp(x_i) / (n + \sum_j exp(x_j))$
+
+    Note: softmax_n, with fixed input, is _not_ shift-symmetric when n != 0, and we must account for this.
+    Normally when computing a softmax, the maxes are subtracted from the inputs for numeric stability.
+    """
+    # compute the maxes along the last dimension
+    input_maxes = input.max(dim=-1, keepdim=True).values
+    # shift the input to prevent overflow (and underflow in the denominator)
+    shifted_inputs = subtract(input, input_maxes)
+    # compute the numerator and softmax_0 denominator using the shifted input
+    numerator = exp(shifted_inputs)
+    original_denominator = numerator.sum(dim=-1, keepdim=True)
+    # we need to shift the zeros in the same way we shifted the inputs
+    shifted_zeros = multiply(input_maxes, -1)
+    # and then add this contribution to the denominator
+    denominator = add(original_denominator, multiply(exp(shifted_zeros), n))
+    return divide(numerator, denominator)
+```
+
+Todo: It might be worth figuring out the most efficient backprop for this? 
+
+Todo: Describe the changes to the model.py
 
 ## Execution Environment
 
