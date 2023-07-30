@@ -96,7 +96,8 @@ The script [lob.py](/src/lob.py) will do the job of running the code in modal.
 
 ## Evaluation
 
-To compare the 2 models, I will compare the perplexity (2^loss) and if it has improved by 5%, I will call that interesting.
+I won't use perplexity to compare the models as we don't expect it to change. However it will be recorded and might be interesting.
 
-Then for fun, will generate some tokens from both models and see if there is much difference in fidelity. But won't conclude anything from that.
+Instead we will use compressibility.
 
+TODO: add more details. discussion is https://github.com/softmax1/nanoGPT_softmax1/issues/1
