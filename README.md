@@ -98,6 +98,17 @@ The script [lob.py](/src/lob.py) will do the job of running the code in modal.
 
 I won't use perplexity to compare the models as we don't expect it to change. However it will be recorded and might be interesting.
 
-Instead we will use compressibility.
+I will use the method here to measure kurtosis: https://github.com/softmax1/softmax1
 
-TODO: add more details. discussion is https://github.com/softmax1/nanoGPT_softmax1/issues/1
+```python
+for name, param in model.named_parameters():
+    mean = param.data.mean()
+    diffs = param.data - mean
+    var = torch.mean(torch.pow(diffs, 2.0))
+    std = torch.pow(var, 0.5)
+    zscores = diffs / std
+    skews = torch.mean(torch.pow(zscores, 3.0))
+    kurtosis = torch.mean(torch.pow(zscores, 4.0)) - 3.0
+```
+
+I will then, time permitting, see what compressability looks like, i.e. what if we quantize the model?
