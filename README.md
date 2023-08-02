@@ -23,7 +23,9 @@ I will run the data preparation here: [prepare.py](https://github.com/karpathy/n
 
 This preparation script uses `tiktoken` encoding from OpenAI, with the `gpt2` setting.
 
-The script to obtain the text and the text itself can be found in the [prepare](./prepare) folder of this repo.
+The script to obtain the text and the text itself can be found in the [obtaintext.py](./stc/patch/obtaintext.py) folder of this repo.
+
+You can download the text [from here](https://q1r1.c19.e2-5.dev/models/reddit_sydney_text_sample.tgz) (sah256 b5d4fe2899431bed3b9f16c1a4773b5088094c5e7c03e77431affffd869e2d3c), at the moment anyway!
 
 ## Model Parameters
 
@@ -91,8 +93,15 @@ Todo: Describe the changes to the model.py
 
 I will be using [modal.com](https://modal.com) to train and evaluate the model. 
 
-The script [prep.sh](/src/prep.sh) will download the repo and replace any files that we needed to modify for this.
-The script [lob.py](/src/lob.py) will do the job of running the code in modal.
+The script [experiment.py](/experiment.py) uses modal to perform the init and training steps on a cloud gpu.
+
+Usage:
+
+```bash
+modal token new
+modal run experiment.py:init
+modal run experiment.py:train
+```
 
 ## Evaluation
 
