@@ -1,7 +1,7 @@
 FROM python:3.9
 
 #    .apt_install("git") \
-RUN pip install torch numpy transformers datasets tiktoken wandb tqdm
+RUN pip install torch numpy transformers datasets tiktoken wandb tqdm boto3[crt]
 WORKDIR /
 RUN git clone https://github.com/karpathy/nanoGPT nanoGPT && \
     cd nanoGPT && \

@@ -3,8 +3,12 @@
 import modal
 
 gpu="a10g"
+
+# This prevents cross-cloud file transfer, but you need to init again
+# when the cloud changes.
 cloud="gcp" if gpu and gpu.startswith("a100") else "aws"
-volume = modal.NetworkFileSystem.new().persisted("nanoGPT_softmax1_20230802_aws")
+volume_name = "nanoGPT_softmax1_20230802"
+volume = modal.NetworkFileSystem.new().persisted(f"{volume_name}_{cloud}")
 image = modal.Image.from_dockerfile("Dockerfile")
 stub = modal.Stub("lob-run", image = image)
 
@@ -17,7 +21,27 @@ code_root = "/volume/nanoGPT"
         network_file_systems={"/volume": volume})
 def ls():
     import os
-    os.system(f"ls -lar")
+    os.system(f"cd /volume && ls -laR")
+
+@stub.function(
+        cloud=cloud, 
+        gpu=None,
+        network_file_systems={"/volume": volume},
+        secret=modal.Secret.from_name("s3-secret"))
+def upload_weights():
+    import boto3
+    import os    
+    import sys
+    bytes = 0
+    def progress(chunk):
+        nonlocal bytes
+        bytes += chunk
+        sys.stdout.write(f"\rUploaded: {bytes}")
+        sys.stdout.flush()
+    b3_session = boto3.Session()
+    b3_client = b3_session.client('s3', endpoint_url=os.environ['AWS_ENDPOINT'])
+    file = os.path.join(code_root, 'out-reddit-softmax-original', 'ckpt.pt')
+    b3_client.upload_file(file, 'models', 'nanoGPT_softmax1/weights/softmax0/ckpt.pt', Callback=progress)
 
 @stub.function(
         cloud=cloud, 
@@ -75,7 +99,7 @@ def init():
 @stub.function(
         cloud=cloud, 
         gpu=gpu,
-        timeout=7200,
+        timeout=24 * 3600,
         secret=modal.Secret.from_name("wandb-secret"),
         network_file_systems={"/volume": volume})
 def train():
