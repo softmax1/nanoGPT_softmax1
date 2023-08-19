@@ -1,7 +1,7 @@
 # nanoGPT @ softmax1
 
 🚧🚧🚧
-> Notice: This page is under construction ... some of the links below wont work and the text may change before I begin the experiment!
+The experiment files are now found in https://github.com/softmax1/nanoGPT_softmax1_reddit/tree/softmax1-final
 
 🚧🚧🚧
 
